@@ -116,7 +116,7 @@ class ChatPromptTemplate(BasePromptTemplate):
         result = []
         for message_template in self.messages:
             if isinstance(message_template, BaseMessage):
-                result.extend(message_template)
+                result.extend([message_template])
             elif isinstance(message_template, BaseMessagePromptTemplate):
                 rel_params = {
                     k: v
