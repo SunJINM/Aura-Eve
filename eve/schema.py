@@ -53,3 +53,10 @@ class SystemMessage(BaseMessage):
 class ChatMessage(BaseMessage):
     role: str
     """消息角色"""
+
+class Document(BaseModel):
+    """文档"""
+    page_content: str
+    """文档内容"""
+    metadata: dict = Field(default_factory=dict)
+    """文档元数据"""
