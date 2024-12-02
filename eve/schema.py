@@ -2,8 +2,9 @@ from __future__ import annotations
 
 
 from abc import ABC, abstractmethod
-from typing import List
-from pydantic import BaseModel, Field
+from typing import Any, Dict, List, Optional
+from click import Option
+from pydantic import BaseModel, Field, model_validator
 
 
 def get_buffer_string(
@@ -60,3 +61,37 @@ class Document(BaseModel):
     """文档内容"""
     metadata: dict = Field(default_factory=dict)
     """文档元数据"""
+
+class Generation(BaseModel):
+    text: str
+    """输出内容"""
+    generation_info: Optional[Dict[str, Any]] = None
+    """其他生成信息"""
+
+
+class LLMResult(BaseModel):
+    generations: List[List[Generation]]
+
+    llm_output: Optional[dict] = None
+
+
+class ChatGeneration(Generation):
+    text: str = ""
+    message: BaseMessage
+
+    @model_validator(mode="after")
+    def set_text(cls, values: ChatGeneration) -> Dict[str, Any]:
+        values.text = values.message.content
+        return values
+    
+class ChatResult(BaseModel):
+    generations: List[ChatGeneration]
+
+    llm_output: Optional[dict] = None
+
+class BaseLanguageModel(BaseModel, ABC):
+
+    def generate_prompt(
+        self, prompts: List[PromptValue], stop: Optional[List[str]] = None
+    ) -> LLMResult:
+        """"""
