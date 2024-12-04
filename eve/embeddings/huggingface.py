@@ -1,30 +1,32 @@
+from __future__ import annotations
 
-from typing import Any, List
-from pydantic import BaseModel, ConfigDict
+from typing import Any, Dict, List
+from pydantic import BaseModel, ConfigDict, model_validator
 from eve.embeddings.base import Embeddings
 
-DEFAULT_MODEL_NAME = "GanymedeNil/text2vec-large-chinese"
+DEFAULT_MODEL_NAME = "BAAI/bge-base-zh-v1.5"
 
-class HuggingFaceEmbeddings(Embeddings, BaseModel):
+class HuggingFaceEmbeddings(BaseModel, Embeddings):
 
-    client: Any
+    client: Any = None
     model_name: str = DEFAULT_MODEL_NAME
-
-    def __init__(self, **kwargs: Any):
         
-        super().__init__(**kwargs)
+    model_config = ConfigDict(
+        extra='forbid',
+        arbitrary_types_allowed=True,
+        protected_namespaces=()
+    )
+
+    @model_validator(mode="after")
+    def validate_environment(cls, values: HuggingFaceEmbeddings) -> HuggingFaceEmbeddings:
         try:
             import sentence_transformers
-            self.client = sentence_transformers.SentenceTransformer(self.model_name)
+            values.client = sentence_transformers.SentenceTransformer(values.model_name)
         except ImportError:
             raise ValueError(
                 "无法导入 sentence_transformers 模块"
             )
-        
-    model_config = ConfigDict(
-        extra='forbid',
-        arbitrary_types_allowed=True
-    )
+        return values
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         texts = list(map(lambda x: x.replace("\n", " "), texts))

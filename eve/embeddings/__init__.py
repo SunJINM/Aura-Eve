@@ -3,5 +3,5 @@ from eve.embeddings.huggingface import HuggingFaceEmbeddings
 
 __all__ = [
     "Embeddings",
-    "HuggingFaceEmbedding"
+    "HuggingFaceEmbeddings"
 ]

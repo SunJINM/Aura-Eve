@@ -91,6 +91,7 @@ class ChatResult(BaseModel):
 
 class BaseLanguageModel(BaseModel, ABC):
 
+    @abstractmethod
     def generate_prompt(
         self, prompts: List[PromptValue], stop: Optional[List[str]] = None
     ) -> LLMResult:
