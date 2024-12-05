@@ -4,7 +4,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 from click import Option
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pytest import Config
 
 
 def get_buffer_string(
@@ -96,3 +97,30 @@ class BaseLanguageModel(BaseModel, ABC):
         self, prompts: List[PromptValue], stop: Optional[List[str]] = None
     ) -> LLMResult:
         """"""
+
+
+class BaseMemory(BaseModel, ABC):
+
+    model_config = ConfigDict(
+        extra='forbid',
+        arbitrary_types_allowed=True
+    )
+
+    @property
+    @abstractmethod
+    def memory_variables(self) -> List[str]:
+        """记忆变量参数"""
+
+    @property
+    @abstractmethod
+    def load_memory_variables(self) -> Dict[str, Any]:
+        """加载记忆"""
+
+    
+    @abstractmethod
+    def save_context(self, inputs: Dict[str, Any], outputs: Dict[str, str]) -> None:
+        """记忆输入和模型输出"""
+
+    @abstractmethod
+    def clear(self) -> None:
+        """清空记忆"""

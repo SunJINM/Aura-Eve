@@ -1,10 +1,14 @@
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 from pydantic import BaseModel
+
+from eve.schema import BaseMemory
 
 
 class Chain(BaseModel, ABC):
+
+    memory: Optional[BaseMemory] = None
 
     @property
     @abstractmethod
@@ -23,20 +27,34 @@ class Chain(BaseModel, ABC):
     def __call__(self, inputs: Union[Dict[str, Any], Any]) -> Dict[str, Any]:
         inputs = self.prep_inputs(inputs)
         try:
-            output = self._call(inputs)
+            outputs = self._call(inputs)
         except (KeyboardInterrupt, Exception) as e:
             raise e
-        return output
+        return self.prep_outputs(inputs, outputs)
 
     def prep_inputs(self, inputs: Union[Dict[str, Any], Any]) -> Dict[str, Any]:
         if not isinstance(inputs, dict):
             _input_keys = set(self.input_keys)
-            if len(_input_keys) != 1:
-                raise ValueError(
-                    "单个值被输入，必须chain的input_key为一个"
-                )
+            if self.memory is not None:
+                _input_keys = _input_keys.difference(self.memory.memory_variables)
+                if len(_input_keys) != 1:
+                    raise ValueError(
+                        "如果仅有一个字符串输入，且该chain期望有多个输入，那么需要字典格式的输入"
+                    )
             inputs = {list(_input_keys)[0]: inputs}
+        if self.memory is not None:
+            external_context = self.memory.load_memory_variables
+            inputs = dict(inputs, **external_context)
         return inputs
+    
+    def prep_outputs(
+        self,
+        inputs: Dict[str, str],
+        outputs: Dict[str, str]
+    ) -> Dict[str, str]:
+        if self.memory is not None:
+            self.memory.save_context(inputs, outputs)
+        return outputs
 
     def run(self, *args: Any, **kwargs: Any) -> str:
         if len(self.output_keys) != 1:
