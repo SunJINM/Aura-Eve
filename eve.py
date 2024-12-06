@@ -1,26 +1,22 @@
 
-from typing import List
-from eve.llms import ZhiPuAI
-from eve.prompts.chat import ChatPromptTemplate
-from eve.schema import AIMessage, BaseMessage, HumanMessage, SystemMessage
+from eve.chat_models import ChatZhiPuAI
+from eve.memory import ConversationBufferMemory
+from eve.chains import LLMChain
+from lib.prompts.prompt import PROMPT
 
-llm = ZhiPuAI()
+llm = ChatZhiPuAI()
+memory = ConversationBufferMemory(human_prefix="jin", ai_prefix="eve")
 
-
-def get_answer(chat_history: List[BaseMessage]) -> str:
-
-    prompt_template = ChatPromptTemplate.from_messages(chat_history)
-    prompt = prompt_template.format()
-    return llm.generate(prompt=prompt)
+chat_chain = LLMChain(
+    memory=memory,
+    prompt=PROMPT,
+    llm=llm
+)
 
 
 if __name__ == "__main__":
-    history_messages: List[BaseMessage] = [SystemMessage(content="你现在要扮演我的女友，今年18岁，叫eve。")]
     while True:
         query = input("Input your question 请输入问题：")
-        history_messages.append(HumanMessage(content=query))
-        print(history_messages)
-        output = get_answer(chat_history=history_messages)
-        history_messages.append(AIMessage(content=output))
+        output = chat_chain.run(input=query)
         print(output)
 
