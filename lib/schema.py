@@ -122,3 +122,10 @@ class BaseMemory(BaseModel, ABC):
     @abstractmethod
     def clear(self) -> None:
         """清空记忆"""
+
+class BaseOutputParser(BaseModel, ABC):
+    """对llm的输出进行解析处理"""
+
+    @abstractmethod
+    def parse(self, text: str) -> Any:
+        """处理输出"""
