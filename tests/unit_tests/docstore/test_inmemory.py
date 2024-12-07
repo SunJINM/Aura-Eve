@@ -1,6 +1,6 @@
 
-from eve.docstore.in_memory import InMemoryDocstore
-from eve.schema import Document
+from lib.docstore.in_memory import InMemoryDocstore
+from lib.schema import Document
 
 
 def test_document_found() -> None:

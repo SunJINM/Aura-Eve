@@ -1,11 +1,11 @@
 
-from eve.chat_models import ChatZhiPuAI
-from eve.memory import ConversationBufferMemory
-from eve.chains import LLMChain
-from lib.prompts.prompt import PROMPT
+from lib.chat_models import ChatZhiPuAI
+from lib.memory import ConversationBufferMemory
+from lib.chains import LLMChain
+from eve.prompts.prompt import PROMPT
 
 llm = ChatZhiPuAI()
-memory = ConversationBufferMemory(human_prefix="jin", ai_prefix="eve")
+memory = ConversationBufferMemory(human_prefix="jin", ai_prefix="lib")
 
 chat_chain = LLMChain(
     memory=memory,

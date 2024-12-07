@@ -1,6 +1,6 @@
 
-from eve.llms.zhipuai import ZhiPuAI
-from eve.schema import LLMResult
+from lib.llms.zhipuai import ZhiPuAI
+from lib.schema import LLMResult
 
 def test_zhipuai_call() -> None:
     prompt = ["你好", "早上好"]

@@ -1,8 +1,8 @@
 
-from eve.chains.llm import LLMChain
-from eve.chat_models.zhipuai import ChatZhiPuAI
-from eve.prompts.prompt import PromptTemplate
-from eve.schema import LLMResult
+from lib.chains.llm import LLMChain
+from lib.chat_models.zhipuai import ChatZhiPuAI
+from lib.prompts.prompt import PromptTemplate
+from lib.schema import LLMResult
 
 
 def test_llm() -> None:

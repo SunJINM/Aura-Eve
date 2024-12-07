@@ -1,7 +1,7 @@
 
 from typing import List
-from eve.prompts.prompt import PromptTemplate
-from eve.prompts.chat import (
+from lib.prompts.prompt import PromptTemplate
+from lib.prompts.chat import (
     AIMessagePromptTemplate,
     BaseMessagePromptTemplate,
     ChatMessagePromptTemplate,
