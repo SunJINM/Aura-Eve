@@ -29,7 +29,7 @@ class WebSocketClient(BaseModel):
         data = json.loads(response).get("response")
         return data
 
-ws_client = WebSocketClient(uri="ws://localhost:8765")
+ws_client = WebSocketClient(uri="ws://localhost:8765/chat")
 global_loop = asyncio.new_event_loop()
 
 async def websocket_chat(input: str, history: List) -> str:
