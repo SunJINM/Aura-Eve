@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, List, Mapping, Optional
+from typing import Any, Dict, Generator, List, Mapping, Optional
 from pydantic import BaseModel, ConfigDict, model_validator
 from lib.llms.base import BaseLLM
 from lib.schema import Generation, LLMResult
@@ -76,3 +76,12 @@ class Ollama(BaseLLM, BaseModel):
             )
         llm_output = {"model_name": self.model_name}
         return LLMResult(generations=generations, llm_output=llm_output)
+    
+    def stream(self, prompt: str, stop: Optional[List[str]] = None) -> Generator:
+        generator = self.client.chat(
+                model=self.model_name,
+                messages=[{"role": "user", "content": prompt}],
+                stream=True,
+                options=self._default_params
+            )
+        return generator

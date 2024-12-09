@@ -1,6 +1,6 @@
 
 from nt import environ
-from typing import Any, Dict, List, Mapping, Optional, Set
+from typing import Any, Dict, Generator, List, Mapping, Optional, Set
 from pydantic import BaseModel, ConfigDict, model_validator
 from lib.llms.base import BaseLLM
 
@@ -94,3 +94,22 @@ class ZhiPuAI(BaseLLM, BaseModel):
             )
         llm_output = {"token_usage": token_usage, "model_name": self.model_name}
         return LLMResult(generations=generations, llm_output=llm_output)
+    
+    def stream(self, prompt: str, stop: Optional[List[str]] = None) -> Generator:
+        params = self.prep_streaming_params(stop)
+        generator = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": prompt}],
+                **params
+            )
+        return generator
+    
+
+    def prep_streaming_params(self, stop: Optional[List[str]] = None) -> Dict[str, Any]:
+        params = self._default_params
+        if stop is not None:
+            if "stop" in params:
+                raise ValueError("停止词参数重复")
+            params["stop"] = stop
+        params["stream"] = True 
+        return params
