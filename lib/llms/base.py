@@ -25,4 +25,4 @@ class BaseLLM(BaseLanguageModel, BaseModel, ABC):
         return self.generate(prompt_strings, stop=stop)
 
     def __call__(self, prompt: str, stop: Optional[List[str]] = None) -> str:
-        return self.generate(prompt, stop=stop).generations[0][0].text
+        return self.generate([prompt], stop=stop).generations[0][0].text
