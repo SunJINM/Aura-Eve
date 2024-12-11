@@ -1,6 +1,6 @@
 import pytest
 
-from lib.formatting import formatter
+from eve_lib.formatting import formatter
 
 def test_valid_formatting() -> None:
     

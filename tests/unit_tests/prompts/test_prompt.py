@@ -1,5 +1,5 @@
 
-from lib.prompts.prompt import PromptTemplate
+from eve_lib.prompts.prompt import PromptTemplate
 
 def test_prompt_valid() -> None:
     template = "这是一个{foo}的测试"

@@ -1,6 +1,6 @@
 
-from lib.chat_models.zhipuai import ChatZhiPuAI
-from lib.schema import BaseMessage, HumanMessage
+from eve_lib.chat_models.zhipuai import ChatZhiPuAI
+from eve_lib.schema import BaseMessage, HumanMessage
 
 def test_chat_zhipuai() -> None:
     chat = ChatZhiPuAI()
