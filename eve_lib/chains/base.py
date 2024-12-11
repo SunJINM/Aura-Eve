@@ -9,6 +9,7 @@ from eve_lib.schema import BaseMemory
 class Chain(BaseModel, ABC):
 
     memory: Optional[BaseMemory] = None
+    default_input_key: Optional[str] = None
 
     @property
     @abstractmethod
@@ -30,7 +31,7 @@ class Chain(BaseModel, ABC):
             outputs = self._call(inputs)
         except (KeyboardInterrupt, Exception) as e:
             raise e
-        return self.prep_outputs(inputs, outputs)
+        return self.prep_outputs(inputs, outputs, self.default_input_key)
 
     def prep_inputs(self, inputs: Union[Dict[str, Any], Any]) -> Dict[str, Any]:
         if not isinstance(inputs, dict):
@@ -50,10 +51,16 @@ class Chain(BaseModel, ABC):
     def prep_outputs(
         self,
         inputs: Dict[str, str],
-        outputs: Dict[str, str]
+        outputs: Dict[str, str],
+        default_input_key: Optional[str] = None
     ) -> Dict[str, str]:
+        new_inputs = {}
+        if default_input_key:
+            new_inputs[default_input_key] = inputs[default_input_key]
+        else:
+            new_inputs = inputs
         if self.memory is not None:
-            self.memory.save_context(inputs, outputs)
+            self.memory.save_context(new_inputs, outputs)
         return outputs
 
     def run(self, *args: Any, **kwargs: Any) -> str:

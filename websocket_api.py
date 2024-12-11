@@ -11,7 +11,7 @@ from eve.prompts.prompt import PROMPT
 
 llm = ZhiPuAI()
 memory = ConversationBufferMemory(human_prefix="Jin", ai_prefix="eve")
-chat_chain = LLMChain(memory=memory, prompt=PROMPT, llm=llm)
+chat_chain = LLMChain(memory=memory, prompt=PROMPT, llm=llm, default_input_key="input")
 parser = RegexParser(regex=r"(.*?)（(.*?)）：(.*)", output_keys=["name", "mode", "content"], default_output_key="content")
 emotion = Emotion.from_llm(llm=llm)
 async def chat_handler(websocket: Any) -> None:
@@ -26,7 +26,7 @@ async def chat_handler(websocket: Any) -> None:
             if not input:
                 await websocket.send(json.dumps({"error": "问题不能为空"}))
             emotion.update_emotional_state(input)
-            print(str(emotion.historical_emotions))
+            print(str(emotion.current_emotional_state))
             output = chat_chain.run(input=input, emotion_state=emotion.format_emotion_state())
             res = parser.parse(output)
             response = f"{res['content']}"

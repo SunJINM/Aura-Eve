@@ -26,7 +26,7 @@ class Emotion(BaseModel):
         if self.current_emotional_state is not None:
             self.historical_emotions.append(
                 HistoryEmotion(
-                    timestamp=timestamp or datetime.now(),
+                    timestamp=timestamp or datetime.datetime.now(),
                     emotional_state=self.current_emotional_state
                 )
             )
@@ -51,23 +51,25 @@ class Emotion(BaseModel):
         updated_emotions = {}
         for emotion_type in current_emotions.keys():
             weighted_history = sum(
-                entry.emotional_state.to_dict()[emotion_type].state * (decay_rate ** idx)
+                entry.emotional_state.to_dict()[emotion_type]["state"] * (decay_rate ** idx)
                 for idx, entry in enumerate(reversed(historical_states))
+                if entry is not None
             )
 
             blended_state = (
-                decay_rate * current_emotions[emotion_type].state +
-                (1 - decay_rate) * new_emotions[emotion_type].state +
+                decay_rate * current_emotions[emotion_type]["state"] +
+                (1 - decay_rate) * new_emotions[emotion_type]["state"] +
                 weighted_history
             )
 
             updated_emotions[emotion_type] = EmotionState(
                 state=max(-1.0, min(1.0, blended_state)),
-                explanation=new_emotions[emotion_type].explanation
+                explanation=new_emotions[emotion_type]["explanation"]
             )
         return BaseEmotionState.from_dict(updated_emotions)
 
-    def format_emotion_state(current_emotional_state: BaseEmotionState) -> str:
+    def format_emotion_state(self,current_emotional_state: Optional[BaseEmotionState] = None) -> str:
+        current_emotional_state = current_emotional_state or self.current_emotional_state
         return f"""
         喜悦-悲伤 (joy_sadness): {current_emotional_state.joy_sadness.state:.2f}
         愤怒-冷静 (anger_calmness): {current_emotional_state.anger_calmness.state:.2f}
